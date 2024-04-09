@@ -25,7 +25,6 @@ def _check_model_output(model: Model) -> bool:
         print(f"  \033[32m\033[1m✔\033[0m\033[0m model generates output correctly")
         return True
     except Exception as e:
-        print("here")
         print(f"  \033[91m\033[1m✘\033[0m\033[0m model output error ({e})")
         return False
 
@@ -35,7 +34,14 @@ def main() -> None:
 
     assert Path(path_to_model).exists()
     sys.path.insert(0, path_to_model)
-    importlib.import_module(model_name)
+    try:
+        importlib.import_module(model_name)
+    except:
+        print(
+            "\033[31mFatal error: \033[0m Failed to load module. Please check if "
+            "the modules are imported correctly in __init__.py."
+        )
+        return
 
     loaded_models = marmot.model.registration.registry.keys()
 
