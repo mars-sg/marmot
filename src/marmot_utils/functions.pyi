@@ -1,0 +1,3 @@
+from typing import Callable
+
+def validate_model(path_to_model: str, print: Callable = ...): ...
