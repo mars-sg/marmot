@@ -1,16 +1,22 @@
 [build-system]
-requires = ["flit_core >=3.2,<4"]
-build-backend = "flit_core.buildapi"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
-[project]
+[tool.poetry]
 name = "marmot"
 description = "MARitime MOdel Testing"
 readme = "README.md"
-requires-python = ">= 3.8"
+authors = ["Kelvin Lee"]
 version = "0.0.0"
-dependencies = [
-    "click>=8.1",
+packages = [
+    { 'include' = 'marmot', from = 'src' },
+    { 'include' = 'marmot_utils', from = 'src' },
 ]
 
-[project.scripts]
+[tool.poetry.dependencies]
+python = "^3.8"
+click = "^8.1"
+requests = "^2.31.0"
+
+[tool.poetry.scripts]
 marmot-utils = "marmot_utils.cli:main"
