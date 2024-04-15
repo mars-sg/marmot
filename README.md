@@ -41,6 +41,9 @@ touch __init__.py main.py
 from marmot import Model
 
 class MyModel(Model):
+    _id = "model-v1"  # Unique name identifier for model
+    _category = "fcp"  # Category to which the model belongs
+
     def __init__(self, **kwargs):
         super().__init__()
 
@@ -57,10 +60,11 @@ class MyModel(Model):
 ```
 
 Few things take note here:
-1. Initialise your model in the `__init__` function of your custom class. This includes codes to initialise the model and load model weights. Any code that should be run only once throughout testing should be housed here.
-2. The `get_output` method is required as it tells the model testing facility how to generate outputs from the inputs provided to the model. The arguments to the method should be changed to reflect specific model requirements.
-3. The `sample_input` method should return a sample input to the `get_output` function. This allows the model testing facility to determine if the `get_output` function is working and producing output as intended.
-4. The dependencies of the models (e.g. pytorch, xgboost, etc) should be indicated in the `requirements.txt` file.
+1. The `_id` and `_category` tells the model testing facility the name of the model and the category to which the model belongs. The id is always followed by the version number with the format `<name>-v<version>`. This id will be used to load the model for testing. The category metadata ensures that the model testing facility feeds the model with the correct input data for testing.
+2. Initialise your model in the `__init__` function of your custom class. This includes codes to initialise the model and load model weights. Any code that should be run only once throughout testing should be housed here.
+3. The `get_output` method is required as it tells the model testing facility how to generate outputs from the inputs provided to the model. The arguments to the method should be changed to reflect specific model requirements.
+4. The `sample_input` method should return a sample input to the `get_output` function. This allows the model testing facility to determine if the `get_output` function is working and producing output as intended.
+5. The dependencies of the models (e.g. pytorch, xgboost, etc) should be indicated in the `requirements.txt` file.
 
 For instance, if you have a trained PyTorch model exported using `torch.save(model, 'path_to_model.pt')`, you can wrap the model as such:
 
@@ -71,6 +75,9 @@ from marmot import Model
 import torch
 
 class FuelConsumptionModel(Model):
+    _id = "fcp-v1"
+    _category = "fcp"
+
     def __init__(self, **kwargs):
         super().__init__()
 
@@ -99,18 +106,15 @@ Once the model is wrapped using the wrapper class `Model`, we need to register a
 ```python
 # fcp/__init__.py
 
-from marmot import register
 from .main import FuelConsumptionModel
 
-register('dnn-v1', 'fcp:FuelConsumptionModel')
+FuelConsumptionModel.register()
 ```
 
-The `register` function takes in two arguments. The first argument is a unique id that is given to the wrapped model. The id is always followed by the version number with the format `<name>-v<version>`. The second argument to the `register` function is the entrypoint to the model. 
-
-From here we can see that if we have multiple versions of the same model we could have added another line to `__init__.py` to register the different versions.
+The `register` function creates an entry in the local model registry such that the user is able to locate and use the model. From here we can see that if we have multiple versions of the same model we could have added another line to `__init__.py` to register the different versions.
 
 ```python
-register('dnn-v2', 'fcp:FuelConsumptionModel2')
+FuelConsumptionModel2.register()
 ```
 
 Once `__init__.py` and `main.py` are sorted out, all that is left is to upload the model to our modelstore for testing. We have provided users with a simple utility that validates the wrapped model, packages and uploads the model to our datastore. To upload the model to our datastore, simply navigate to the parent directory of `fcp` and run the following:
