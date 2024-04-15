@@ -40,7 +40,7 @@ class Model:
     def sample_input(self):
         self._raise_not_defined_error("sample_input")
 
-    def get_output(self):
+    def get_output(self, *args, **kwargs):
         self._raise_not_defined_error("get_output")
 
     def __call__(self, *args: Any) -> Any:
@@ -56,5 +56,8 @@ if __name__ == "__main__":
         def __init__(self) -> None:
             super().__init__()
 
+        def get_output(self, x: float) -> float:
+            return x
+
     model = TestModel()
-    model()
+    model(0.0)
