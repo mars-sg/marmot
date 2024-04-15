@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
+import marmot
+
 if TYPE_CHECKING:
     from marmot.model.registration import ModelSpec
 
@@ -42,6 +44,13 @@ class Model:
 
     def get_output(self, *args, **kwargs):
         self._raise_not_defined_error("get_output")
+
+    @staticmethod
+    def register(cls, id: str, category: str):
+        def create_model(**kwargs) -> Model:
+            return cls()
+
+        marmot.register(id, create_model)
 
     def __call__(self, *args: Any) -> Any:
         return self.get_output(*args)
