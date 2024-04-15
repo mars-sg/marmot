@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -10,23 +11,21 @@ class NotImplementedException(BaseException):
     pass
 
 
+@dataclass
+class ModelMetadata:
+    id: str
+    category: str
+
+
 class Model:
-    _REQUIRED_KEYS = ["name"]
+    _id: str
+    _category: str
 
+    metadata: ModelMetadata
     spec: ModelSpec | None = None
-    # name = ""
 
-    # def __init__(self, info: dict[str, Any]) -> None:
-    #     self._find_and_set_parameters(info)
-
-    # def _find_and_set_parameter(self, key: str, info: dict[str, Any]) -> None:
-    #     assert key in info, f"Key `{key}` not found in initialisation."
-
-    #     self.__dict__[key] = info[key]
-
-    # def _find_and_set_parameters(self, info: dict[str, Any]) -> None:
-    #     for key in self._REQUIRED_KEYS:
-    #         self._find_and_set_parameter(key, info)
+    def __init__(self) -> None:
+        self.metadata = ModelMetadata(id=self._id, category=self._category)
 
     def _raise_not_defined_error(self, fn_name: str) -> None:
         if self.spec is None:
@@ -51,7 +50,11 @@ class Model:
 if __name__ == "__main__":
 
     class TestModel(Model):
-        pass
+        _id = "test-v1"
+        _category = "test"
+
+        def __init__(self) -> None:
+            super().__init__()
 
     model = TestModel()
     model()
