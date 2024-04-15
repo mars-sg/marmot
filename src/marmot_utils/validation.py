@@ -41,7 +41,7 @@ def main() -> None:
             "\033[31mFatal error: \033[0m Failed to load module. Please check if "
             "the modules are imported correctly in __init__.py."
         )
-        return
+        exit()
 
     loaded_models = marmot.model.registration.registry.keys()
 
