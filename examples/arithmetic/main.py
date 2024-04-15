@@ -4,6 +4,9 @@ from marmot import Model
 
 
 class Add(Model):
+    _id = "add-v1"
+    _category = "arith_add"
+
     def __init__(self, **kwargs):
         super().__init__()
 
@@ -20,6 +23,9 @@ class Add(Model):
 
 
 class Multiply(Model):
+    _id = "multiply-v1"
+    _category = "arith_mul"
+
     def __init__(self, **kwargs):
         super().__init__()
 

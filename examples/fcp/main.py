@@ -8,6 +8,9 @@ from marmot import Model
 
 
 class FuelConsumptionModel1(Model):
+    _id = "dnn-v1"
+    _category = "fcp"
+
     def __init__(self, **kwargs):
         super().__init__()
 
@@ -24,6 +27,9 @@ class FuelConsumptionModel1(Model):
 
 
 class FuelConsumptionModel2(Model):
+    _id = "dnn-v2"
+    _category = "fcp"
+
     def __init__(self, **kwargs):
         super().__init__()
 
