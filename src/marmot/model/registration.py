@@ -5,12 +5,15 @@ sys.path.insert(0, ".marmot_models")
 import copy
 import difflib
 import importlib
+import json
 import logging
 import re
 from dataclasses import dataclass, field
 from importlib.util import find_spec
 from pathlib import Path
 from typing import Any, Protocol
+
+import requests
 
 from ..core import Model
 
@@ -299,6 +302,14 @@ def register(
         logging.warn(f"Overriding model {new_spec.id} already in registry")
 
     registry[new_spec.id] = new_spec
+
+
+def get_categories() -> dict[str, list[int]]:
+    try:
+        response = requests.request("GET", "http://172.20.116.94:8234/models")
+        return json.loads(response.text)
+    except:
+        raise Exception("Could not retrieve model categories from model registry.")
 
 
 def load(

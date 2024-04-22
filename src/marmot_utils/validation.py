@@ -1,5 +1,6 @@
 import importlib
 import sys
+from functools import lru_cache
 from pathlib import Path
 
 import marmot  # type: ignore
@@ -26,6 +27,32 @@ def _check_model_output(model: Model) -> bool:
         return True
     except Exception as e:
         print(f"  \033[91m\033[1m✘\033[0m\033[0m model output error ({e})")
+        return False
+
+
+@lru_cache
+def _get_categories() -> dict[str, list[int]]:
+    return marmot.model.registration.get_categories()
+
+
+def _check_category_exists(model: Model) -> bool:
+    *_name, _version = model.metadata.category.split("-")
+    name = "-".join(_name)
+    version = int(_version[1:])
+
+    categories = _get_categories()
+
+    if name in categories and version in categories[name]:
+        print(
+            "  \033[32m\033[1m✔\033[0m\033[0m test for model category "
+            f"`{model.metadata.category}` exists"
+        )
+        return True
+    else:
+        print(
+            "  \033[91m\033[1m✘\033[0m\033[0m test for model category "
+            f"`{model.metadata.category}` not found"
+        )
         return False
 
 
@@ -63,6 +90,7 @@ def main() -> None:
             ok = False
             continue
 
+        model_ok &= _check_category_exists(model)
         model_ok &= _check_implemented(model, "get_output")
         model_ok &= _check_implemented(model, "sample_input")
 
