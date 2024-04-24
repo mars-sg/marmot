@@ -7,6 +7,10 @@ from typing import Any, Generic, TypeVar
 import marmot
 
 
+class NotImplementedException(BaseException):
+    pass
+
+
 @dataclass
 class ModelMetadata:
     id: str

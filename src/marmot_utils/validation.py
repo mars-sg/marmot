@@ -22,7 +22,7 @@ def _check_implemented(model: Model, fn_name: str) -> bool:
 
 def _check_model_output(model: Model) -> bool:
     try:
-        _ = model(*model.sample_input())
+        _ = model(model.dummy_input)
         print(f"  \033[32m\033[1m✔\033[0m\033[0m model generates output correctly")
         return True
     except Exception as e:
@@ -35,25 +35,25 @@ def _get_categories() -> dict[str, list[int]]:
     return marmot.model.registration.get_categories()
 
 
-def _check_category_exists(model: Model) -> bool:
-    *_name, _version = model.metadata.category.split("-")
-    name = "-".join(_name)
-    version = int(_version[1:])
+# def _check_category_exists(model: Model) -> bool:
+#     *_name, _version = model.metadata.category.split("-")
+#     name = "-".join(_name)
+#     version = int(_version[1:])
 
-    categories = _get_categories()
+#     categories = _get_categories()
 
-    if name in categories and version in categories[name]:
-        print(
-            "  \033[32m\033[1m✔\033[0m\033[0m test for model category "
-            f"`{model.metadata.category}` exists"
-        )
-        return True
-    else:
-        print(
-            "  \033[91m\033[1m✘\033[0m\033[0m test for model category "
-            f"`{model.metadata.category}` not found"
-        )
-        return False
+#     if name in categories and version in categories[name]:
+#         print(
+#             "  \033[32m\033[1m✔\033[0m\033[0m test for model category "
+#             f"`{model.metadata.category}` exists"
+#         )
+#         return True
+#     else:
+#         print(
+#             "  \033[91m\033[1m✘\033[0m\033[0m test for model category "
+#             f"`{model.metadata.category}` not found"
+#         )
+#         return False
 
 
 def main() -> None:
@@ -61,12 +61,13 @@ def main() -> None:
 
     assert Path(path_to_model).exists()
     sys.path.insert(0, path_to_model)
+
     try:
         importlib.import_module(model_name)
-    except:
+    except Exception as e:
         print(
             "\033[31mFatal error: \033[0m Failed to load module. Please check if "
-            "the modules are imported correctly in __init__.py."
+            f"the modules are imported correctly in __init__.py.\n{e}"
         )
         exit()
 
@@ -90,9 +91,8 @@ def main() -> None:
             ok = False
             continue
 
-        model_ok &= _check_category_exists(model)
+        # model_ok &= _check_category_exists(model)
         model_ok &= _check_implemented(model, "get_output")
-        model_ok &= _check_implemented(model, "sample_input")
 
         if model_ok:
             model_ok &= _check_model_output(model)

@@ -1,1 +1,1 @@
-from .core import Model
+from .core import Model, NotImplementedException
