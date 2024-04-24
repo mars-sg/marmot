@@ -2,5 +2,5 @@
 
 from .main import *
 
-FuelConsumptionModel1.register()
-FuelConsumptionModel2.register()
+FuelConsumptionModel1.register_model()
+FuelConsumptionModel2.register_model()
