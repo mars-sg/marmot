@@ -2,5 +2,5 @@
 
 from .main import *
 
-Add.register()
-Multiply.register()
+BatchMean.register_model()
+RecursiveMean.register_model()
