@@ -304,14 +304,6 @@ def register(
     registry[new_spec.id] = new_spec
 
 
-def get_categories() -> dict[str, list[int]]:
-    try:
-        response = requests.request("GET", "http://172.20.116.94:8234/models")
-        return json.loads(response.text)
-    except:
-        raise Exception("Could not retrieve model categories from model registry.")
-
-
 def load(
     id: str | ModelSpec,
     **kwargs: Any,
