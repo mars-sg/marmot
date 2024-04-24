@@ -15,7 +15,7 @@ from typing import Any, Protocol
 
 import requests
 
-from ..core import Model
+from .core import Model
 
 MODEL_ID_RE = re.compile(
     r"^(?:(?P<namespace>[\w:-]+)\/)?(?:(?P<name>[\w:.-]+?))(?:-v(?P<version>\d+))?$"

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import NamedTuple
 
-from ..core import Model
+from ..model import Model
 
 
 @dataclass

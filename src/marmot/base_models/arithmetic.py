@@ -1,6 +1,6 @@
 from typing import Sequence
 
-from ..core import Model
+from ..model import Model
 
 FloatSequence = Sequence[float]
 
