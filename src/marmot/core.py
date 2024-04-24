@@ -1,69 +1,72 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import Any, Generic, TypeVar
 
 import marmot
-
-if TYPE_CHECKING:
-    from marmot.model.registration import ModelSpec
-
-
-class NotImplementedException(BaseException):
-    pass
 
 
 @dataclass
 class ModelMetadata:
     id: str
-    category: str
 
 
-class Model:
+I = TypeVar("I")
+O = TypeVar("O")
+
+
+class Model(ABC, Generic[I, O]):
     _id: str
-    _category: str
-
-    metadata: ModelMetadata
-    spec: ModelSpec | None = None
 
     def __init__(self) -> None:
-        self.metadata = ModelMetadata(id=self._id, category=self._category)
+        self.metadata = ModelMetadata(self._id)
 
-    def _raise_not_defined_error(self, fn_name: str) -> None:
-        if self.spec is None:
-            raise NotImplementedException(
-                f"`{fn_name}` function not defined for `{type(self).__name__}` model"
-            )
-        else:
-            raise NotImplementedException(
-                f"`{fn_name}` function not defined for `{self.spec.id}` model"
-            )
+    @property
+    @abstractmethod
+    def dummy_input(self) -> I:
+        pass
 
-    def sample_input(self):
-        self._raise_not_defined_error("sample_input")
+    @property
+    @abstractmethod
+    def dummy_output(self) -> O:
+        pass
 
-    def get_output(self, *args, **kwargs):
-        self._raise_not_defined_error("get_output")
+    @abstractmethod
+    def get_output(self, *args: Any, **kwargs: Any) -> O:
+        pass
 
     @classmethod
-    def register(cls) -> None:
+    def register_model(cls) -> None:
+        try:
+            cls()
+        except Exception as e:
+            raise RuntimeError(f"`{cls.__name__}` model not defined properly. {e}")
+
         def create_model(**kwargs) -> Model:
             return cls()
 
         marmot.register(cls._id, create_model)
 
-    def __call__(self, *args: Any) -> Any:
-        return self.get_output(*args)
+    def __call__(self, *args: Any, **kwargs: Any) -> O:
+        return self.get_output(*args, **kwargs)
 
 
 if __name__ == "__main__":
 
-    class TestModel(Model):
+    class TestModel(Model[float, float]):
         _id = "test-v1"
-        _category = "test"
 
         def __init__(self) -> None:
             super().__init__()
+
+        @property
+        def dummy_input(self) -> float:
+            return 1.0
+
+        @property
+        def dummy_output(self) -> float:
+            return 1.0
 
         def get_output(self, x: float) -> float:
             return x
