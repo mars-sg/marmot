@@ -5,6 +5,7 @@ sys.path.insert(0, ".marmot_models")
 import copy
 import difflib
 import importlib
+import json
 import logging
 import re
 from dataclasses import dataclass, field
@@ -12,7 +13,9 @@ from importlib.util import find_spec
 from pathlib import Path
 from typing import Any, Protocol
 
-from ..core import Model
+import requests
+
+from .core import Model
 
 MODEL_ID_RE = re.compile(
     r"^(?:(?P<namespace>[\w:-]+)\/)?(?:(?P<name>[\w:.-]+?))(?:-v(?P<version>\d+))?$"

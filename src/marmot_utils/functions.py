@@ -58,7 +58,7 @@ def cleanup() -> None:
         shutil.rmtree(tmp_path)
 
 
-def _clone_marmot_repo(python: Path, local_repo: Path | None = None) -> str:
+def _install_marmot(python: Path, local_repo: Path | None = None) -> str:
     out = subprocess.run(
         [
             python,
@@ -160,7 +160,7 @@ def validate_model(
     venv_python = _create_validation_virtual_env()
 
     # Install marmot repo in validation venv
-    _clone_marmot_repo(venv_python, local_repo=local_repo)
+    _install_marmot(venv_python, local_repo=local_repo)
 
     # Install user-defined dependencies in requirements.txt
     requirements_file = (directory / "requirements.txt").absolute()

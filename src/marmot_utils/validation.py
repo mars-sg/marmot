@@ -21,7 +21,7 @@ def _check_implemented(model: Model, fn_name: str) -> bool:
 
 def _check_model_output(model: Model) -> bool:
     try:
-        _ = model(*model.sample_input())
+        _ = model(model.dummy_input)
         print(f"  \033[32m\033[1m✔\033[0m\033[0m model generates output correctly")
         return True
     except Exception as e:
@@ -34,12 +34,13 @@ def main() -> None:
 
     assert Path(path_to_model).exists()
     sys.path.insert(0, path_to_model)
+
     try:
         importlib.import_module(model_name)
-    except:
+    except Exception as e:
         print(
             "\033[31mFatal error: \033[0m Failed to load module. Please check if "
-            "the modules are imported correctly in __init__.py."
+            f"the modules are imported correctly in __init__.py.\n{e}"
         )
         exit()
 
@@ -64,7 +65,6 @@ def main() -> None:
             continue
 
         model_ok &= _check_implemented(model, "get_output")
-        model_ok &= _check_implemented(model, "sample_input")
 
         if model_ok:
             model_ok &= _check_model_output(model)

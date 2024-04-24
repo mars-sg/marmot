@@ -1,41 +1,32 @@
 # project_name/main.py
 
-from marmot import Model
+from typing import Sequence
+
+from marmot.base_models.arithmetic import MeanModel
 
 
-class Add(Model):
-    _id = "add-v1"
-    _category = "arith_add"
+class BatchMean(MeanModel):
+    _id = "mean-v1"
 
-    def __init__(self, **kwargs):
+    def __init__(self) -> None:
         super().__init__()
 
-    def sample_input(self):
-        return (0, 2, 3, 4, 5, 9)
-
-    def get_output(self, *x: int):
-        out = 0
-
-        for num in x:
-            out += num
-
-        return out
+    def get_output(self, x: Sequence[float]) -> float:
+        return sum(x) / len(x)
 
 
-class Multiply(Model):
-    _id = "multiply-v1"
-    _category = "arith_mul"
+class RecursiveMean(MeanModel):
+    _id = "mean-v2"
 
-    def __init__(self, **kwargs):
+    def __init__(self) -> None:
         super().__init__()
 
-    def sample_input(self):
-        return (0, 2, 3, 4, 5, 9)
+    def get_output(self, x: Sequence[float]) -> float:
+        cur_mean = 0.0
+        cur_k = 0
 
-    def get_output(self, *x):
-        out = 1
+        for item in x:
+            cur_mean = (cur_k * cur_mean + item) / (cur_k + 1)
+            cur_k += 1
 
-        for num in x:
-            out *= num
-
-        return out
+        return cur_mean

@@ -4,42 +4,31 @@ from pathlib import Path
 
 import torch
 
-from marmot import Model
+from marmot.base_models.fuel_consumption import (
+    DailyFuelConsumptionRateModel,
+    NoonReport,
+)
 
 
-class FuelConsumptionModel1(Model):
+class FuelConsumptionModel1(DailyFuelConsumptionRateModel):
     _id = "dnn-v1"
-    _category = "fcp"
 
-    def __init__(self, **kwargs):
+    def __init__(self):
         super().__init__()
 
-        # Initialise your model here
         self.model = torch.load(Path(__file__).parent / "model1.pt")
 
-    def sample_input(self):
-        # Return a sample input to the `get_output` function
-        return (torch.Tensor([0.33, 0.77]),)
-
-    def get_output(self, x):
-        # The logic of the model goes here
-        return self.model(x)
+    def get_output(self, x: NoonReport) -> float:
+        return self.model(torch.Tensor([x.length, x.width]))
 
 
-class FuelConsumptionModel2(Model):
+class FuelConsumptionModel2(DailyFuelConsumptionRateModel):
     _id = "dnn-v2"
-    _category = "fcp"
 
-    def __init__(self, **kwargs):
+    def __init__(self):
         super().__init__()
 
-        # Initialise your model here
         self.model = torch.load(Path(__file__).parent / "model2.pt")
 
-    def sample_input(self):
-        # Return a sample input to the `get_output` function
-        return (torch.Tensor([0.33, 0.77]),)
-
-    def get_output(self, x):
-        # The logic of the model goes here
-        return self.model(x)
+    def get_output(self, x: NoonReport) -> float:
+        return self.model(torch.Tensor([x.length, x.width]))
