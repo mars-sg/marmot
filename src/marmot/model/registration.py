@@ -11,7 +11,7 @@ import re
 from dataclasses import dataclass, field
 from importlib.util import find_spec
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Optional, Protocol, Union
 
 import requests
 
@@ -29,15 +29,15 @@ class ModelCreator(Protocol):
 @dataclass
 class ModelSpec:
     id: str
-    entry_point: ModelCreator | str
+    entry_point: Union[ModelCreator, str]
 
     # model initialisation arguments
     kwargs: dict = field(default_factory=dict)
 
     # post-init attributes
-    namespace: str | None = field(init=False)
+    namespace: Optional[str] = field(init=False)
     name: str = field(init=False)
-    version: int | None = field(init=False)
+    version: Optional[int] = field(init=False)
 
     def __post_init__(self):
         self.namespace, self.name, self.version = parse_model_id(self.id)
@@ -45,10 +45,10 @@ class ModelSpec:
 
 # Global registry of models. Meant to be accessed through `register` and `make`
 registry: dict[str, ModelSpec] = {}
-current_namespace: str | None = None
+current_namespace: Optional[str] = None
 
 
-def parse_model_id(model_id: str) -> tuple[str | None, str, int | None]:
+def parse_model_id(model_id: str) -> tuple[Optional[str], str, Optional[int]]:
     match = MODEL_ID_RE.fullmatch(model_id)
     if not match:
         raise Exception(f"Malformed model ID: {model_id}")
@@ -60,7 +60,7 @@ def parse_model_id(model_id: str) -> tuple[str | None, str, int | None]:
     return ns, name, version
 
 
-def get_model_id(ns: str | None, name: str, version: int | None) -> str:
+def get_model_id(ns: Optional[str], name: str, version: Optional[int]) -> str:
     full_name = name
     if ns is not None:
         full_name = f"{ns}/{name}"
@@ -70,7 +70,7 @@ def get_model_id(ns: str | None, name: str, version: int | None) -> str:
     return full_name
 
 
-def find_highest_version(ns: str | None, name: str) -> int | None:
+def find_highest_version(ns: Optional[str], name: str) -> Optional[int]:
     version: list[int] = [
         model_spec.version
         for model_spec in registry.values()
@@ -82,7 +82,7 @@ def find_highest_version(ns: str | None, name: str) -> int | None:
     return max(version, default=None)
 
 
-def _check_namespace_exists(ns: str | None):
+def _check_namespace_exists(ns: Optional[str]):
     if ns is None:
         return
 
@@ -106,7 +106,7 @@ def _check_namespace_exists(ns: str | None):
     raise Exception(f"Namespace {ns} not found. {suggestion_msg}")
 
 
-def _check_name_exists(ns: str | None, name: str):
+def _check_name_exists(ns: Optional[str], name: str):
     _check_namespace_exists(ns)
 
     names: set[str] = {
@@ -124,7 +124,7 @@ def _check_name_exists(ns: str | None, name: str):
     raise Exception(f"Model `{name}` does not exist{namespace_msg}.{suggestion_msg}")
 
 
-def _check_version_exists(ns: str | None, name: str, version: int | None):
+def _check_version_exists(ns: Optional[str], name: str, version: Optional[int]):
     if get_model_id(ns, name, version) in registry:
         return
 
@@ -274,14 +274,14 @@ def load_model_creator(name: str) -> ModelCreator:
 
 
 def register(
-    id: str, entry_point: str | ModelCreator | None, kwargs: dict = {}
+    id: str, entry_point: Optional[Union[str, ModelCreator]], kwargs: dict = {}
 ) -> None:
     assert entry_point is not None, "`entry_point` must be provided"
     global registry, current_namespace
     ns, name, version = parse_model_id(id)
 
     if current_namespace is not None:
-        kwargs_namespace: str | None = kwargs.get("namespace")
+        kwargs_namespace: Optional[str] = kwargs.get("namespace")
 
         if kwargs_namespace is not None and kwargs_namespace != current_namespace:
             logging.warn(
@@ -289,7 +289,7 @@ def register(
                 f"by namespace `{current_namespace}`."
             )
 
-        ns_id: str | None = current_namespace
+        ns_id: Optional[str] = current_namespace
     else:
         ns_id = ns
 
@@ -305,7 +305,7 @@ def register(
 
 
 def load(
-    id: str | ModelSpec,
+    id: Union[str, ModelSpec],
     **kwargs: Any,
 ) -> Model:
     if isinstance(id, ModelSpec):
