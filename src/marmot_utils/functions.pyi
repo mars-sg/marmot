@@ -1,7 +1,7 @@
-from typing import Callable
+from typing import Callable, Optional
 
 def cleanup() -> None: ...
 def upload_model(path_to_model: str, print: Callable = ...): ...
 def validate_model(
-    path_to_model: str, print: Callable = ..., local_repo: str | None = None
+    path_to_model: str, print: Callable = ..., local_repo: Optional[str] = None
 ): ...

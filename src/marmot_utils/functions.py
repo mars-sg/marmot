@@ -5,7 +5,7 @@ import subprocess
 import sys
 import zipfile
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Optional
 
 import requests
 
@@ -58,7 +58,7 @@ def cleanup() -> None:
         shutil.rmtree(tmp_path)
 
 
-def _install_marmot(python: Path, local_repo: Path | None = None) -> str:
+def _install_marmot(python: Path, local_repo: Optional[Path] = None) -> str:
     out = subprocess.run(
         [
             python,
@@ -138,7 +138,7 @@ def _compress_model(path_to_model: Path) -> Path:
 def validate_model(
     path_to_model: str,
     print: Callable = lambda *args: None,
-    local_repo: Path | None = None,
+    local_repo: Optional[Path] = None,
 ) -> bool:
     directory = Path(path_to_model)
     model_name = directory.stem
