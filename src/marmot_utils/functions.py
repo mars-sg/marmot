@@ -11,9 +11,8 @@ import requests
 
 _MARMOT_VALIDATION_VENV_NAME = ".marmot-validation-venv"
 _MARMOT_TMP_DIR = ".marmot-tmp"
-_MARMOT_MODELSTORE_API_IP = "172.20.116.94"
-_MARMOT_MODELSTORE_API_PORT = "8234"
-_MARMOT_REPOSITORY = "git+ssh://git@github.com/mars-sg/marmot.git"
+_MARMOT_MODELSTORE_API_IP = "18.139.60.55"
+_MARMOT_REPOSITORY = "http://github.com/mars-sg/marmot.git"
 
 
 def _check_file_exists(file: str, directory: Path) -> bool:
@@ -188,7 +187,6 @@ def upload_model(path_to_model: str, print: Callable = lambda *args: None):
 
     print(f"==> Uploading models...")
     requests.post(
-        f"http://{_MARMOT_MODELSTORE_API_IP}:{_MARMOT_MODELSTORE_API_PORT}"
-        f"/models/{directory.stem}",
+        f"http://{_MARMOT_MODELSTORE_API_IP}/marmot/models/{directory.stem}",
         files={"file": archive_fn.open("rb")},
     )
