@@ -44,7 +44,7 @@ class ModelSpec:
 
 
 # Global registry of models. Meant to be accessed through `register` and `make`
-registry: dict[str, ModelSpec] = {}
+_registry: dict[str, ModelSpec] = {}
 current_namespace: Optional[str] = None
 
 
@@ -71,9 +71,11 @@ def get_model_id(ns: Optional[str], name: str, version: Optional[int]) -> str:
 
 
 def find_highest_version(ns: Optional[str], name: str) -> Optional[int]:
+    global _registry
+
     version: list[int] = [
         model_spec.version
-        for model_spec in registry.values()
+        for model_spec in _registry.values()
         if model_spec.namespace == ns
         and model_spec.name == name
         and model_spec.version is not None
@@ -83,12 +85,14 @@ def find_highest_version(ns: Optional[str], name: str) -> Optional[int]:
 
 
 def _check_namespace_exists(ns: Optional[str]):
+    global _registry
+
     if ns is None:
         return
 
     namespaces: set[str] = {
         model_spec.namespace
-        for model_spec in registry.values()
+        for model_spec in _registry.values()
         if model_spec.namespace is not None
     }
 
@@ -107,11 +111,12 @@ def _check_namespace_exists(ns: Optional[str]):
 
 
 def _check_name_exists(ns: Optional[str], name: str):
+    global _registry
     _check_namespace_exists(ns)
 
     names: set[str] = {
         model_spec.name
-        for model_spec in registry.values()
+        for model_spec in _registry.values()
         if model_spec.namespace == ns
     }
     if name in names:
@@ -125,7 +130,9 @@ def _check_name_exists(ns: Optional[str], name: str):
 
 
 def _check_version_exists(ns: Optional[str], name: str, version: Optional[int]):
-    if get_model_id(ns, name, version) in registry:
+    global _registry
+
+    if get_model_id(ns, name, version) in _registry:
         return
 
     _check_name_exists(ns, name)
@@ -136,7 +143,7 @@ def _check_version_exists(ns: Optional[str], name: str, version: Optional[int]):
 
     model_specs = [
         model_spec
-        for model_spec in registry.values()
+        for model_spec in _registry.values()
         if model_spec.namespace == ns and model_spec.name == name
     ]
     model_specs = sorted(
@@ -165,10 +172,12 @@ def _check_version_exists(ns: Optional[str], name: str, version: Optional[int]):
 
 
 def _check_spec_register(testing_spec: ModelSpec):
+    global _registry
+
     latest_versioned_spec = max(
         (
             model_spec
-            for model_spec in registry.values()
+            for model_spec in _registry.values()
             if model_spec.namespace == testing_spec.namespace
             and model_spec.name == testing_spec.name
             and model_spec.version is not None
@@ -180,7 +189,7 @@ def _check_spec_register(testing_spec: ModelSpec):
     unversioned_spec = next(
         (
             model_spec
-            for model_spec in registry.values()
+            for model_spec in _registry.values()
             if model_spec.namespace == testing_spec.namespace
             and model_spec.name == testing_spec.name
             and model_spec.version is None
@@ -203,6 +212,8 @@ def _check_spec_register(testing_spec: ModelSpec):
 
 
 def _find_spec(model_id: str) -> ModelSpec:
+    global _registry
+
     # For string id's, load the model spec from the registry then make the model spec
     assert isinstance(model_id, str)
 
@@ -240,7 +251,7 @@ def _find_spec(model_id: str) -> ModelSpec:
             ) from e
 
     # load the model spec from the registry
-    model_spec = registry.get(model_name)
+    model_spec = _registry.get(model_name)
 
     # update model spec is not version provided, raise warninig if out of date
     ns, name, version = parse_model_id(model_name)
@@ -249,7 +260,7 @@ def _find_spec(model_id: str) -> ModelSpec:
     if version is None and latest_version is not None:
         version = latest_version
         new_model_id = get_model_id(ns, name, version)
-        model_spec = registry.get(new_model_id)
+        model_spec = _registry.get(new_model_id)
         logging.warn(
             f"Using the latest versioned model `{new_model_id}` "
             f"instead of the unversioned model `{model_name}`."
@@ -273,11 +284,16 @@ def load_model_creator(name: str) -> ModelCreator:
     return fn
 
 
+def get_available_models() -> list[str]:
+    global _registry
+    return [key for key, _ in _registry.items()]
+
+
 def register(
     id: str, entry_point: Optional[Union[str, ModelCreator]], kwargs: dict = {}
 ) -> None:
     assert entry_point is not None, "`entry_point` must be provided"
-    global registry, current_namespace
+    global _registry, current_namespace
     ns, name, version = parse_model_id(id)
 
     if current_namespace is not None:
@@ -298,10 +314,10 @@ def register(
     new_spec = ModelSpec(id=full_model_id, entry_point=entry_point, kwargs=kwargs)
     _check_spec_register(new_spec)
 
-    if new_spec.id in registry:
+    if new_spec.id in _registry:
         logging.warn(f"Overriding model {new_spec.id} already in registry")
 
-    registry[new_spec.id] = new_spec
+    _registry[new_spec.id] = new_spec
 
 
 def load(
