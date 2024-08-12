@@ -4,6 +4,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Generic, TypeVar
 
+from validation import _check_implemented, _check_model_output
+
 import marmot
 
 
@@ -54,6 +56,15 @@ class Model(ABC, Generic[I, O]):
 
     def __call__(self, *args: Any, **kwargs: Any) -> O:
         return self.get_output(*args, **kwargs)
+
+    def validate(self, verbose: bool = False) -> bool:
+        if not _check_implemented(self, "get_output", verbose=verbose):
+            return False
+
+        if not _check_model_output(self, verbose=verbose):
+            return False
+
+        return True
 
 
 if __name__ == "__main__":
