@@ -4,9 +4,9 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Generic, TypeVar
 
-from validation import _check_implemented, _check_model_output
-
 import marmot
+
+from .validation import _check_implemented, _check_model_output
 
 
 class NotImplementedException(BaseException):
