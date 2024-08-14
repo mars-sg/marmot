@@ -66,7 +66,7 @@ def _install_marmot(python: Path, local_repo: Optional[Path] = None) -> str:
             "pip",
             "install",
             "-q",
-            _MARMOT_REPOSITORY if local_repo is None else local_repo,
+            f"git+{_MARMOT_REPOSITORY}" if local_repo is None else local_repo,
         ],
         capture_output=True,
         text=True,
