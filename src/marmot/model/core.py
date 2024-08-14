@@ -4,13 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Generic, TypeVar
 
-<<<<<<< Updated upstream
-import marmot
-=======
 from .registration import register
->>>>>>> Stashed changes
-
-from .validation import _check_implemented, _check_model_output
 
 
 class NotImplementedException(BaseException):
