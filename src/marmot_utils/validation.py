@@ -4,6 +4,7 @@ from pathlib import Path
 
 import marmot  # type: ignore
 from marmot import Model, NotImplementedException
+from marmot.model import get_available_models
 
 
 def _check_implemented(model: Model, fn_name: str) -> bool:
@@ -44,21 +45,23 @@ def main() -> None:
         )
         exit()
 
-    loaded_models = marmot.model.registration.registry.keys()
+    loaded_models = get_available_models()
 
     ok = True
     for model_name in loaded_models:
         model_ok = True
         print(f"==> Checking model `{model_name}`")
 
-        try:
-            model = marmot.load(model_name)
-        except:
-            model_ok = False
-            print(
-                f"  \033[31mError: \033[0m Cannot load model {model_name}. "
-                "Check if the entry point is defined correctly."
-            )
+        print(model_name)
+
+        # try:
+        model = marmot.load(model_name)
+        # except Exception as e:
+        #     model_ok = False
+        #     print(
+        #         f"  \033[31mError: \033[0m Cannot load model {model_name}. "
+        #         f"Check if the entry point is defined correctly. {e}"
+        #     )
 
         if not model_ok:
             ok = False

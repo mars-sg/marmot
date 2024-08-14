@@ -4,13 +4,10 @@ from pathlib import Path
 
 import torch
 
-from marmot.base_models.fuel_consumption import (
-    DailyFuelConsumptionRateModel,
-    NoonReport,
-)
+from marmot.base_models.fuel_consumption import DailyFuelConsumptionModel, NoonReport
 
 
-class FuelConsumptionModel1(DailyFuelConsumptionRateModel):
+class FuelConsumptionModel1(DailyFuelConsumptionModel):
     _id = "dnn-v1"
 
     def __init__(self):
@@ -22,7 +19,7 @@ class FuelConsumptionModel1(DailyFuelConsumptionRateModel):
         return self.model(torch.Tensor([x.length, x.width]))
 
 
-class FuelConsumptionModel2(DailyFuelConsumptionRateModel):
+class FuelConsumptionModel2(DailyFuelConsumptionModel):
     _id = "dnn-v2"
 
     def __init__(self):

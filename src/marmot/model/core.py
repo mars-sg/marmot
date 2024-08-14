@@ -4,7 +4,11 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Generic, TypeVar
 
+<<<<<<< Updated upstream
 import marmot
+=======
+from .registration import register
+>>>>>>> Stashed changes
 
 from .validation import _check_implemented, _check_model_output
 
@@ -52,7 +56,7 @@ class Model(ABC, Generic[I, O]):
         def create_model(**kwargs) -> Model:
             return cls()
 
-        marmot.register(cls._id, create_model)
+        register(cls._id, create_model)
 
     def __call__(self, *args: Any, **kwargs: Any) -> O:
         return self.get_output(*args, **kwargs)
@@ -65,6 +69,37 @@ class Model(ABC, Generic[I, O]):
             return False
 
         return True
+
+
+def _check_implemented(model: Model, fn_name: str, verbose: bool = False) -> bool:
+    try:
+        getattr(model, fn_name)()
+    except NotImplementedException:
+        if verbose:
+            print(f"  \033[91m\033[1m✘\033[0m\033[0m {fn_name} is not implemented")
+        return False
+    except:
+        pass
+
+    if verbose:
+        print(f"  \033[32m\033[1m✔\033[0m\033[0m {fn_name} is implemented")
+
+    return True
+
+
+def _check_model_output(model: Model, verbose: bool = True) -> bool:
+    try:
+        _ = model(model.dummy_input)
+
+        if verbose:
+            print(f"  \033[32m\033[1m✔\033[0m\033[0m model generates output correctly")
+
+        return True
+    except Exception as e:
+        if verbose:
+            print(f"  \033[91m\033[1m✘\033[0m\033[0m model output error ({e})")
+
+        return False
 
 
 if __name__ == "__main__":

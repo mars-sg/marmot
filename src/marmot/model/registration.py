@@ -5,7 +5,6 @@ sys.path.insert(0, ".marmot_models")
 import copy
 import difflib
 import importlib
-import json
 import logging
 import re
 from dataclasses import dataclass, field
@@ -13,17 +12,13 @@ from importlib.util import find_spec
 from pathlib import Path
 from typing import Any, Optional, Protocol, Union
 
-import requests
-
-from .core import Model
-
 MODEL_ID_RE = re.compile(
     r"^(?:(?P<namespace>[\w:-]+)\/)?(?:(?P<name>[\w:.-]+?))(?:-v(?P<version>\d+))?$"
 )
 
 
 class ModelCreator(Protocol):
-    def __call__(self, **kwargs: Any) -> Model: ...
+    def __call__(self, **kwargs: Any) -> "Model": ...
 
 
 @dataclass
@@ -323,7 +318,7 @@ def register(
 def load(
     id: Union[str, ModelSpec],
     **kwargs: Any,
-) -> Model:
+) -> "Model":
     if isinstance(id, ModelSpec):
         model_spec = id
     else:
@@ -350,6 +345,8 @@ def load(
         raise type(e)(
             f"{e} was raised from the model creator for {model_spec.id} with kwargs ({model_spec_kwargs})"
         )
+
+    from .core import Model
 
     if not isinstance(model, Model):
         raise TypeError(
