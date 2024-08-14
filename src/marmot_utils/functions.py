@@ -72,6 +72,17 @@ def _install_marmot(python: Path, local_repo: Optional[Path] = None) -> str:
         text=True,
     )
 
+    print(
+        [
+            python,
+            "-m",
+            "pip",
+            "install",
+            "-q",
+            f"git+{_MARMOT_REPOSITORY}" if local_repo is None else local_repo,
+        ]
+    )
+
     if out.returncode != 0:
         raise RuntimeError(
             f"Could not clone marmot repository.\n{'='*80}\n{out.stderr}{'='*80}"
