@@ -58,6 +58,7 @@ def cleanup() -> None:
 
 
 def _install_marmot(python: Path, local_repo: Optional[Path] = None) -> str:
+    print(f"==> Installing marmot...")
     out = subprocess.run(
         [
             python,
@@ -80,6 +81,7 @@ def _install_marmot(python: Path, local_repo: Optional[Path] = None) -> str:
 
 
 def _install_dependencies(python: Path, requirements_file: Path) -> str:
+    print(f"==> Installing dependencies from requirements.txt...")
     out = subprocess.run(
         [python, "-m", "pip", "install", "-qr", requirements_file],
         capture_output=True,

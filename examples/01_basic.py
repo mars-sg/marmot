@@ -1,13 +1,11 @@
+import sys
+
 import marmot as mt
+from marmot.model.registration import get_available_models, registry
 
-model = mt.load("vwt:add_two-v1")
-print(model(13, 2))
+sys.path.insert(0, "/Users/leek4/Desktop/marmot/examples")
 
-model = mt.load("vwt:multiply_two-v1")
-print(model(13, 2))
+import fcp
 
-model = mt.load("vwt:add-v1")
-print(model(13, 2, 1, 90, 0))
-
-model = mt.load("vwt:multiply-v1")
-print(model(13, 2, 1, 90, 0))
+print(registry)
+print(get_available_models())
