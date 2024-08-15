@@ -9,8 +9,9 @@ class NotImplementedException(BaseException): ...
 class ModelMetadata:
     id: str
     def __init__(self, id) -> None: ...
-I = TypeVar('I')
-O = TypeVar('O')
+
+I = TypeVar("I")
+O = TypeVar("O")
 
 class Model(ABC, Generic[I, O], metaclass=abc.ABCMeta):
     @property
@@ -24,3 +25,4 @@ class Model(ABC, Generic[I, O], metaclass=abc.ABCMeta):
     @classmethod
     def register_model(cls) -> None: ...
     def __call__(self, *args: Any, **kwargs: Any) -> O: ...
+    def validate(self, verbose: bool, return_on_failure: bool) -> bool: ...

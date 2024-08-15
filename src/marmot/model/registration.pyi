@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from re import Pattern
 from typing import Any, Optional, Protocol, Union
 
-from ..core import Model as Model
+from .core import Model
 
 MODEL_ID_RE: Pattern
 

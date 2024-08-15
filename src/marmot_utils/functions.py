@@ -30,7 +30,6 @@ def _create_validation_virtual_env() -> Path:
     venv_path = Path.cwd() / _MARMOT_VALIDATION_VENV_NAME
 
     print(f"==> Creating new virtual environment for validation ({venv_path})")
-    print(f"OS NAME: {os.name}")
 
     python = sys.executable
     subprocess.run([python, "-m", "venv", str(venv_path)])
@@ -169,7 +168,7 @@ def validate_model(
 
     # Validate model, all errors are properly handled
     # This block will not raise any error even if the model is not ok
-    validation_script = (Path(__file__).parent / "validation.py").absolute()
+    validation_script = (Path(__file__).parent / "validation_script.py").absolute()
     out = _run_validation(venv_python, validation_script, directory)
 
     print(out)

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sys
 
 sys.path.insert(0, ".marmot_models")
@@ -10,7 +12,10 @@ import re
 from dataclasses import dataclass, field
 from importlib.util import find_spec
 from pathlib import Path
-from typing import Any, Optional, Protocol, Union
+from typing import TYPE_CHECKING, Any, Optional, Protocol, Union
+
+if TYPE_CHECKING:
+    from .core import Model
 
 MODEL_ID_RE = re.compile(
     r"^(?:(?P<namespace>[\w:-]+)\/)?(?:(?P<name>[\w:.-]+?))(?:-v(?P<version>\d+))?$"
@@ -18,7 +23,7 @@ MODEL_ID_RE = re.compile(
 
 
 class ModelCreator(Protocol):
-    def __call__(self, **kwargs: Any) -> "Model": ...
+    def __call__(self, **kwargs: Any) -> Model: ...
 
 
 @dataclass
@@ -318,7 +323,7 @@ def register(
 def load(
     id: Union[str, ModelSpec],
     **kwargs: Any,
-) -> "Model":
+) -> Model:
     if isinstance(id, ModelSpec):
         model_spec = id
     else:

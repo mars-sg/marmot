@@ -55,8 +55,11 @@ class Model(ABC, Generic[I, O]):
     def __call__(self, *args: Any, **kwargs: Any) -> O:
         return self.get_output(*args, **kwargs)
 
-    def validate(self, verbose: bool = False) -> bool:
-        if not _check_implemented(self, "get_output", verbose=verbose):
+    def validate(self, verbose: bool = False, return_on_failure: bool = False) -> bool:
+        if (
+            not _check_implemented(self, "get_output", verbose=verbose)
+            and return_on_failure
+        ):
             return False
 
         if not _check_model_output(self, verbose=verbose):
